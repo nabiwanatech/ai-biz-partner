@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import ChatGoogleGenerativeAI
+import json
+from google.oauth2 import service_account
+from langchain_google_vertexai import ChatVertexAI
 from langchain_community.retrievers import BM25Retriever
 
 # 1. API 키 불러오기 (클라우드와 PC 환경 모두 완벽 대응)
@@ -32,20 +34,25 @@ def setup_ai():
     # 2-3. 에러를 원천 차단한 가볍고 강력한 BM25 검색엔진 적용
     retriever = BM25Retriever.from_documents(splits)
     retriever.k = 3
-    
-    # 2-4. 답변 생성 모델 (가장 안정적인 모델 적용)
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-3.8-flash", 
-        temperature=0.1,
-        google_api_key=api_key
-    )
-    
-    return llm, retriever, len(docs)
 
-# 3. 공고문 데이터베이스 로딩 (지워져서 에러를 유발했던 핵심 부분입니다!)
+    # 🔥 수정 1: 바깥에서 쓸 수 있도록 결과물을 반환(return)해 줍니다.
+    return retriever, len(docs)
+    
+key_dict = json.loads(st.secrets["GOOGLE_CLOUD_KEY"])
+credentials = service_account.Credentials.from_service_account_info(key_dict)
+
+llm = ChatVertexAI(
+    model_name="gemini-1.5-flash", 
+    project=key_dict["project_id"],
+    credentials=credentials,
+    temperature=0.1
+)
+
+# 3. 공고문 데이터베이스 로딩
 st.subheader("📂 공고문 데이터베이스 로딩 중...")
 try:
-    llm, retriever, doc_count = setup_ai()
+    # 🔥 수정 2: 바깥에서 이미 만든 llm은 빼고, 검색엔진과 문서 개수만 받아옵니다.
+    retriever, doc_count = setup_ai()
     st.success(f"성공적으로 총 {doc_count}페이지 분량의 공고문을 학습했습니다! 이제 AI에게 물어보세요.")
 except Exception as e:
     st.error(f"오류가 발생했습니다. (에러내용: {e})")
