@@ -5,3 +5,5 @@ langchain-text-splitters
 langchain-google-genai
 pypdf
 rank_bm25
+langchain-google-vertexai
+google-auth
