@@ -8,15 +8,6 @@ from google.oauth2 import service_account
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.retrievers import BM25Retriever
 
-# 1. API 키 불러오기 (클라우드와 PC 환경 모두 완벽 대응)
-try:
-    # 1순위: 스트림릿 클라우드의 보안 비밀고(Secrets)에서 키를 먼저 찾음
-    api_key = st.secrets["GOOGLE_API_KEY"]
-except:
-    # 2순위: 내 PC 환경일 경우 .env 파일에서 키를 찾음
-    load_dotenv()
-    api_key = os.environ.get("GOOGLE_API_KEY")
-
 st.set_page_config(page_title="AI-Biz 파트너", layout="wide")
 st.title("🤖 기업 맞춤형 정부지원사업 AI 추천기")
 
@@ -38,7 +29,7 @@ def setup_ai():
     # 🔥 수정 1: 바깥에서 쓸 수 있도록 결과물을 반환(return)해 줍니다.
     return retriever, len(docs)
     
-key_dict = json.loads(st.secrets["GOOGLE_CLOUD_KEY"])
+key_dict = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(key_dict)
 
 llm = ChatVertexAI(
