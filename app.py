@@ -33,9 +33,9 @@ key_dict = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(key_dict)
 
 llm = ChatVertexAI(
-    model_name="gemini-1.5-flash-001",  # 🔥 이처럼 세부 버전 번호를 명시적으로 추가합니다.
+    model_name="gemini-1.5-flash-002",  # 최신 안정화 버전(-002)으로 변경
     project=key_dict["project_id"],
-    location="us-central1",
+    location="asia-northeast3",         # 미국(us-central1) 대신 서울 데이터센터로 변경
     credentials=credentials,
     temperature=0.1
 )
