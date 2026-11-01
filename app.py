@@ -35,6 +35,7 @@ credentials = service_account.Credentials.from_service_account_info(key_dict)
 llm = ChatVertexAI(
     model_name="gemini-1.5-flash", 
     project=key_dict["project_id"],
+    location="us-central1",  # 이 줄이 반드시 포함되어야 합니다.
     credentials=credentials,
     temperature=0.1
 )
