@@ -33,7 +33,7 @@ key_dict = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(key_dict)
 
 llm = ChatVertexAI(
-    model_name="gemini-1.5-flash", 
+    model_name="gemini-1.5-flash-002",  # -002 버전을 명시적으로 추가합니다.
     project=key_dict["project_id"],
     location="us-central1",
     credentials=credentials,
